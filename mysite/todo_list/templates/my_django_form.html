@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}My Django Form{% endblock %}
+{% block content %}
+
+
+   <form  method="POST">
+   	  {{ form.as_p }}
+      {% csrf_token %}
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Submit Form</button>
+    </form>
+
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Person{% endblock %}
+{% block content %}
+<form class="form-inline my-2 my-lg-0" method="POST">
+ <select class="form-control" id="sel1">
+ 	<option></option>
+{% for country in countries %}
+
+  <option value="{{ country.pk }}"{% if country.id == selected_id %}selected{% endif %}>
+        {{ country.name }}
+    </option>
+
+{% endfor %}
+</select>
+
+
+
+</form>
+
+{% endblock %}
+
