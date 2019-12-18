@@ -8,9 +8,10 @@ https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
 import os
-
+import sys
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'todo_app.settings')
-
+sys.path.append('D:/DjangoStuff/my_app')
+sys.path.append('D:/DjangoStuff/my_app/todo_app')
 application = get_wsgi_application()

@@ -26,7 +26,7 @@ SECRET_KEY = 'ce15m61!7+7z-$-l6-5x#((dhqi%^l%_*li!ypo49_#%k&%q_p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['riyad19811981.pythonanywhere.com']
+ALLOWED_HOSTS = ['riyad19811981.pythonanywhere.com', '127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -37,9 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'todo_list',
+    'crispy_forms',
 
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

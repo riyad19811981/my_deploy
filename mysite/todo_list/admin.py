@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import List, Topic, WebPage, AccessRecord, Country, City, Person, UserProfileInfo
+from .models import List, Topic, WebPage, AccessRecord, Country, City, Person, UserProfileInfo, Category, Coin
 
 admin.site.register(List)
 admin.site.register(Topic)
@@ -9,4 +9,6 @@ admin.site.register(Country)
 admin.site.register(City)
 admin.site.register(Person)
 admin.site.register(UserProfileInfo)
+admin.site.register(Category)
+admin.site.register(Coin)
 

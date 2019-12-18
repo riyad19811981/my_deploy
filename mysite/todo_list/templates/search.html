@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+  <div class="card card-body">
+	  <form method="get" action="{% url 'search' %}">
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="selectCountry">Country</label>
+
+         <select class="form-control"  name="country" id="selectCountry">
+ 	<option></option>
+{% for country in countries %}
+  <option value="{{ country.pk }}"{% if country.pk == context.country %}selected{% endif %}>{{ country.name }}</option>
+{% endfor %}
+</select>
+
+    </div>
+    <div class="form-group col-md-4">
+      <label for="currency_name">Currency Name</label>
+      <input type="text" value="{{ context.currency_name }}" name="currency_name" class="form-control" id="currency_name">
+    </div>
+      <div class="form-group col-md-4">
+      <label for="selectCategory">Category</label>
+
+         <select class="form-control" name="category" id="selectCategory">
+ 	<option></option>
+{% for category in categories %}
+  <option value="{{ category.pk }}"{% if category.pk == context.category %}selected{% endif %}>{{ category.name }}</option>
+{% endfor %}
+</select>
+
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="inputRealseDateAD">Realse Year AD</label>
+      <input type="text" value="{{ context.realse_year_ad }}" name="realse_year_ad" class="form-control" id="inputRealseDateAD">
+    </div>
+    <div class="form-group col-md-4">
+     <label for="inputRealseDateAH">Realse Year AH</label>
+      <input type="text" value="{{ context.realse_year_ah }}" name="realse_year_ah" class="form-control" id="inputRealseDateAH">
+    </div>
+       <div class="form-group col-md-4">
+      <label for="inputMetalType">Metal Type</label>
+      <input type="text" value="{{ context.metal_type }}" name="metal_type" class="form-control" id="inputMetalType">
+    </div>
+
+  </div>
+ <div class="form-row">
+       <div class="form-group col-md-4">
+      <label for="inputKM">KM Number</label>
+      <input type="text" value="{{ context.km }}"  name="km" class="form-control" id="inputKM">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="inputPickNumber">Pick Number</label>
+      <input type="text" value="{{ context.pick_number }}"  name="pick_number" class="form-control" id="inputPickNumber">
+    </div>
+    <div class="form-group col-md-4">
+     <label for="inputSerial">Serial Number</label>
+      <input type="text" value="{{ context.serial_number }}" name ="serial_number" class="form-control" id="inputSerial">
+    </div>
+
+  </div>
+  <div class="form-row">
+       <div class="form-group col-md-4">
+      <label for="inputQuantity">Quantity</label>
+      <input type="text" value="{{ context.quantity }}" name="quantity" class="form-control" id="inputQuantity">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="inputUSAPrice">USA Price</label>
+      <input type="text" value="{{ context.usa_price }}" name="usa_price" class="form-control" id="inputUSAPrice">
+    </div>
+    <div class="form-group col-md-4">
+     <label for="inputCatalogPrice">Catalog Price</label>
+      <input type="text" value="{{ context.catalog_price }}" name="catalog_price" class="form-control" id="inputCatalogPrice">
+    </div>
+
+  </div>
+          <button type="submit"  class="btn btn-primary">Search</button>
+          <a href="{% url 'search' %}" class="btn btn-secondary">Cancel</a>
+</form>
+  </div>
+
+
+<br>
+
+{% if filter_coins%}
+<table id="table_id"  class="display table table-bordered">
+        <thead>
+    <tr>
+        <th><center>Rank</center></th>
+        <th><center>Country</center></th>
+        <th><center>Currency Name</center></th>
+        <th><center>Realse Year AD</center></th>
+        <th><center>Quantity</center></th>
+        <th><center>USA Price</center></th>
+        <th><center>Total USA Price</center></th>
+        <th><center>Total SAR Price</center></th>
+        <th><center>KM#</center></th>
+    </tr>
+     </thead>
+     <tbody>
+	{% for coin in filter_coins.qs %}
+
+	<tr>
+		<td><center><a href="{% url 'editcoin' coin.id %}">{{ forloop.counter }}</a></center></td>
+        <td><center>{{coin.country}}</center></td>
+		<td><center>{{coin.currency_name}}</center></td>
+        <td><center>{{coin.realse_year_ad}}</center></td>
+        <td><center>{{coin.quantity}}</center></td>
+        <td><center>${{coin.usa_price|floatformat:2|intcomma}}</center></td>
+        <td><center>${{coin.usa_total_price|floatformat:2|intcomma}}</center></td>
+        <td><center>SAR {{coin.sar_total_price|floatformat:2|intcomma}}</center></td>
+        <td><center>{{coin.km}}</center></td>
+    </tr>
+	{% endfor %}
+     </tbody>
+</table>
+{% endif %}
+
+    </div>
+<br>
+{% endblock %}
+{% block extra_javascript %}
+    <script>
+$(document).ready( function () {
+    $('#table_id').DataTable();
+} );
+    </script>
+{% endblock extra_javascript %}
+
+
+
+
+

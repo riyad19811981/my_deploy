@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+{% if form %}
+<div class="card card-body">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+      <div class="col-4">
+        {{ form.country|as_crispy_field }}
+      </div>
+      <div class="col-4">
+        {{ form.currency_name|as_crispy_field }}
+      </div>
+             <div class="col-4">
+        {{ form.currency_value|as_crispy_field }}
+      </div>
+
+    </div>
+          <div class="row">
+      <div class="col-4">
+        {{ form.realse_year_ad|as_crispy_field }}
+      </div>
+      <div class="col-4">
+        {{ form.realse_year_ah|as_crispy_field }}
+      </div>
+             <div class="col-4">
+        {{ form.metal_type|as_crispy_field }}
+      </div>
+
+    </div>
+          <div class="row">
+      <div class="col-4">
+        {{ form.km|as_crispy_field }}
+      </div>
+      <div class="col-4">
+        {{ form.pick_number|as_crispy_field }}
+      </div>
+             <div class="col-4">
+        {{ form.serial_number|as_crispy_field }}
+      </div>
+
+    </div>
+             <div class="row">
+      <div class="col-4">
+        {{ form.quantity|as_crispy_field }}
+      </div>
+      <div class="col-4">
+        {{ form.usa_price|as_crispy_field }}
+      </div>
+             <div class="col-4">
+        {{ form.catalog_price|as_crispy_field }}
+      </div>
+
+    </div>
+          <div class="row">
+      <div class="col-4">
+        {{ form.category|as_crispy_field }}
+      </div>
+               <div class="col-4">
+        {{ form.remarks|as_crispy_field }}
+      </div>
+
+
+    </div>
+
+        <button type="submit"  class="btn btn-primary">Save</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+        <a  href="{% url 'deletecoin' coin_id %}"  class="btn btn-danger" style="visibility: {{ disable_delete }}">Delete</a>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

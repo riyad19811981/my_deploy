@@ -1,8 +1,11 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from .forms import ListForm, MyDjangoForm, UserForm, UserProfileInfoForm
-from .models import List, Country
+
+from .filters import CoinFilter
+from .forms import ListForm, MyDjangoForm, UserForm, UserProfileInfoForm, CoinFilterForm, CoinForm
+from .models import List, Country, Category, Coin
 from django.views.generic import View
+from django.db.models import Q, Sum, F, FloatField
 
 # Extra Imports for the Login and Logout Capabilities
 from django.contrib.auth import authenticate, login, logout
@@ -73,25 +76,87 @@ def show_image(request):
 
 
 def home(request):
-    if request.method == 'POST':
-        form = ListForm(request.POST or None)
-        if form.is_valid():
-            form.save()
-            all_items = List.objects.all
-            messages.success(request, 'Item has been added to list')
-            return render(request, 'home.html', {'all_items': all_items})
+    all_coins = Coin.objects.all().order_by('country__name', 'realse_year_ad')
+    return render(request, 'home.html', {'all_coins': all_coins, 'navbar': 'home'})
+
+
+def coins(request, category):
+    all_coins = Coin.objects.filter(category__name=category).order_by('country__name', 'realse_year_ad')
+    return render(request, 'home.html', {'all_coins': all_coins, 'navbar': category})
+
+
+def summary(request):
+    total_quantity = Coin.objects.aggregate(Sum('quantity'))
+
+    usa_total_price = Coin.objects.aggregate(value=Sum(F('quantity') * F('usa_price'), output_field=FloatField()))
+
+    ksa_total_price = usa_total_price['value'] * 3.75
+
+    # total_quantity_by_category = Coin.objects.values('category__name').annotate(Sum('quantity'))
+
+    total_quantity_by_category = Coin.objects.values('category__name').annotate(Sum('quantity')).annotate(value=Sum(F('quantity') * F('usa_price'), output_field=FloatField()))
+
+    total_quantity_by_country = Coin.objects.values('country__name').annotate(Sum('quantity')).annotate(value=Sum(F('quantity') * F('usa_price'), output_field=FloatField()))
+
+    return render(request, 'summary.html',
+                  {'total_quantity_by_country': total_quantity_by_country, 'usa_total_price': usa_total_price,
+                   'total_quantity_by_category': total_quantity_by_category,
+                   'total_quantity': total_quantity,
+                   'ksa_total_price': ksa_total_price, 'navbar': 'summary'})
+
+
+def search(request):
+    countries = Country.objects.all
+    categories = Category.objects.all
+    isRequestEmpy = all(value == '' for value in request.GET.values())
+    if isRequestEmpy:
+        return render(request, 'search.html',
+                      {'countries': countries, 'categories': categories, 'navbar': 'search'})
     else:
-        all_items = List.objects.all
-        return render(request, 'home.html', {'all_items': all_items})
+        form = CoinFilterForm(request.GET or None)
+        if form.is_valid():
+            context = getContext(form)
+            coins_list = Coin.objects.all().order_by('country__name', 'realse_year_ad')
+            filter_coins = CoinFilter(request.GET, queryset=coins_list)
+            return render(request, 'search.html',
+                          {'filter_coins': filter_coins, 'countries': countries, 'categories': categories,
+                           'context': context, 'navbar': 'search'})
 
 
 def about(request):
-    context = {'first_name': 'Riyad', 'last_name': 'Alkhatib', 'greeting': 'hello world'}
+    context = {'first_name': 'Salah', 'last_name': 'Alkhatib', 'greeting': 'hello world'}
     return render(request, 'about.html', context)
+
+
+def getContext(form):
+    country = form.cleaned_data.get("country")
+    category = form.cleaned_data.get("category")
+    currency_name = form.cleaned_data.get("currency_name")
+    realse_year_ad = form.cleaned_data.get("realse_year_ad")
+    realse_year_ah = form.cleaned_data.get("realse_year_ah")
+    km = form.cleaned_data.get("km")
+    metal_type = form.cleaned_data.get("metal_type")
+    quantity = form.cleaned_data.get("quantity")
+    usa_price = form.cleaned_data.get("usa_price")
+    catalog_price = form.cleaned_data.get("catalog_price")
+    pick_number = form.cleaned_data.get("pick_number")
+    serial_number = form.cleaned_data.get("serial_number")
+    return {'currency_name': currency_name, 'realse_year_ad': realse_year_ad,
+            'realse_year_ah': realse_year_ah, 'km': km, 'metal_type': metal_type,
+            'quantity': quantity, 'usa_price': usa_price, 'catalog_price': catalog_price,
+            'pick_number': pick_number, 'serial_number': serial_number,
+            'country': country, 'category': category}
 
 
 def delete(request, list_id):
     item = List.objects.get(pk=list_id)
+    item.delete()
+    messages.success(request, 'Item has been deleted')
+    return redirect('home')
+
+
+def deletecoin(request, coin_id):
+    item = Coin.objects.get(pk=coin_id)
     item.delete()
     messages.success(request, 'Item has been deleted')
     return redirect('home')
@@ -123,6 +188,36 @@ def edit(request, list_id):
     else:
         item = List.objects.get(pk=list_id)
         return render(request, 'edit.html', {'item': item})
+
+
+def addcoin(request):
+    if request.method == 'POST':
+        form = CoinForm(request.POST or None)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Item has been added')
+            return redirect('home')
+    else:
+        form = CoinForm()
+        return render(request, 'editcoin.html', {'form': form, 'coin_id': 0, 'disable_delete': 'hidden'})
+
+
+def editcoin(request, coin_id):
+    countries = Country.objects.all
+    categories = Category.objects.all
+    if request.method == 'POST':
+        item = Coin.objects.get(pk=coin_id)
+        form = CoinForm(request.POST or None, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Item has been edited')
+            return redirect('home')
+
+    else:
+        item = Coin.objects.get(pk=coin_id)
+        form = CoinForm(request.POST or None, instance=item)
+        return render(request, 'editcoin.html',
+                      {'form': form, 'coin_id': coin_id, 'countries': countries, 'categories': categories})
 
 
 def my_django_form(request):
