@@ -35,7 +35,8 @@
     <tr>
         <th width="33%"><center>Category</center></th>
         <th width="37%"><center>Total quantity</center></th>
-        <th><center>Total Price</center></th>
+        <th><center>Total USA Price</center></th>
+        <th><center>Total KSA Price</center></th>
     </tr>
       </thead>
       <tbody>
@@ -43,7 +44,8 @@
 	<tr>
         <td><center>{{y.category__name}}</center></td>
         <td><center>{{y.quantity__sum|intcomma}}</center></td>
-        <td><center>$ {{y.value|floatformat:2|intcomma}}</center></td>
+        <td><center>$ {{y.usa_value|floatformat:2|intcomma}}</center></td>
+        <td><center>SAR {{y.ksa_value|floatformat:2|intcomma}}</center></td>
     </tr>
       {% endfor %}
       </tbody>
@@ -61,7 +63,8 @@
     <tr>
         <th><center>Country</center></th>
         <th><center>Total quantity</center></th>
-        <th><center>Total Price</center></th>
+        <th><center>Total USA Price</center></th>
+        <th><center>Total KSA Price</center></th>
     </tr>
       </thead>
       <tbody>
@@ -69,7 +72,8 @@
 	<tr>
         <td><center>{{y.country__name}}</center></td>
         <td><center>{{y.quantity__sum|intcomma}}</center></td>
-        <td><center>$ {{y.value|floatformat:2|intcomma}}</center></td>
+        <td><center>$ {{y.usa_value|floatformat:2|intcomma}}</center></td>
+        <td><center>SAR {{y.ksa_value|floatformat:2|intcomma}}</center></td>
     </tr>
       {% endfor %}
       </tbody>

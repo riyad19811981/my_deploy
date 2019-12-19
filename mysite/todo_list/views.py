@@ -60,11 +60,11 @@ def user_login(request):
                 return HttpResponseRedirect(reverse('home'))
             else:
                 # If account is not active:
-                return HttpResponse("Your account is not active.")
+                return render(request, 'login.html', {'login_error': 'Your account is not active'})
         else:
             print("Someone tried to login and failed.")
             print("They used username: {} and password: {}".format(username, password))
-            return HttpResponse("Invalid login details supplied.")
+            return render(request, 'login.html', {'login_error': 'Invalid login details supplied'})
 
     else:
         # Nothing has been provided for username or password.
@@ -75,16 +75,19 @@ def show_image(request):
     return render(request, 'show_image.html')
 
 
+@login_required
 def home(request):
     all_coins = Coin.objects.all().order_by('country__name', 'realse_year_ad')
     return render(request, 'home.html', {'all_coins': all_coins, 'navbar': 'home'})
 
 
+@login_required
 def coins(request, category):
     all_coins = Coin.objects.filter(category__name=category).order_by('country__name', 'realse_year_ad')
     return render(request, 'home.html', {'all_coins': all_coins, 'navbar': category})
 
 
+@login_required
 def summary(request):
     total_quantity = Coin.objects.aggregate(Sum('quantity'))
 
@@ -92,11 +95,13 @@ def summary(request):
 
     ksa_total_price = usa_total_price['value'] * 3.75
 
-    # total_quantity_by_category = Coin.objects.values('category__name').annotate(Sum('quantity'))
+    total_quantity_by_category = Coin.objects.values('category__name').annotate(Sum('quantity'))\
+        .annotate(usa_value=Sum(F('quantity') * F('usa_price'), output_field=FloatField())) \
+        .annotate(ksa_value=Sum(F('quantity') * F('usa_price') * 3.75, output_field=FloatField()))
 
-    total_quantity_by_category = Coin.objects.values('category__name').annotate(Sum('quantity')).annotate(value=Sum(F('quantity') * F('usa_price'), output_field=FloatField()))
-
-    total_quantity_by_country = Coin.objects.values('country__name').annotate(Sum('quantity')).annotate(value=Sum(F('quantity') * F('usa_price'), output_field=FloatField()))
+    total_quantity_by_country = Coin.objects.values('country__name').annotate(Sum('quantity'))\
+        .annotate(usa_value=Sum(F('quantity') * F('usa_price'), output_field=FloatField())) \
+        .annotate(ksa_value=Sum(F('quantity') * F('usa_price') * 3.75, output_field=FloatField()))
 
     return render(request, 'summary.html',
                   {'total_quantity_by_country': total_quantity_by_country, 'usa_total_price': usa_total_price,
@@ -105,6 +110,7 @@ def summary(request):
                    'ksa_total_price': ksa_total_price, 'navbar': 'summary'})
 
 
+@login_required
 def search(request):
     countries = Country.objects.all
     categories = Category.objects.all
@@ -132,6 +138,7 @@ def getContext(form):
     country = form.cleaned_data.get("country")
     category = form.cleaned_data.get("category")
     currency_name = form.cleaned_data.get("currency_name")
+    currency_value = form.cleaned_data.get("currency_value")
     realse_year_ad = form.cleaned_data.get("realse_year_ad")
     realse_year_ah = form.cleaned_data.get("realse_year_ah")
     km = form.cleaned_data.get("km")
@@ -141,13 +148,15 @@ def getContext(form):
     catalog_price = form.cleaned_data.get("catalog_price")
     pick_number = form.cleaned_data.get("pick_number")
     serial_number = form.cleaned_data.get("serial_number")
+    remarks = form.cleaned_data.get("remarks")
     return {'currency_name': currency_name, 'realse_year_ad': realse_year_ad,
             'realse_year_ah': realse_year_ah, 'km': km, 'metal_type': metal_type,
             'quantity': quantity, 'usa_price': usa_price, 'catalog_price': catalog_price,
             'pick_number': pick_number, 'serial_number': serial_number,
-            'country': country, 'category': category}
+            'country': country, 'category': category, 'remarks': remarks, 'currency_value': currency_value}
 
 
+@login_required
 def delete(request, list_id):
     item = List.objects.get(pk=list_id)
     item.delete()
@@ -155,6 +164,7 @@ def delete(request, list_id):
     return redirect('home')
 
 
+@login_required
 def deletecoin(request, coin_id):
     item = Coin.objects.get(pk=coin_id)
     item.delete()
@@ -190,6 +200,7 @@ def edit(request, list_id):
         return render(request, 'edit.html', {'item': item})
 
 
+@login_required
 def addcoin(request):
     if request.method == 'POST':
         form = CoinForm(request.POST or None)
@@ -202,6 +213,7 @@ def addcoin(request):
         return render(request, 'editcoin.html', {'form': form, 'coin_id': 0, 'disable_delete': 'hidden'})
 
 
+@login_required
 def editcoin(request, coin_id):
     countries = Country.objects.all
     categories = Category.objects.all

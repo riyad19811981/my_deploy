@@ -30,6 +30,7 @@ class CoinFilterForm(forms.Form):
     country = forms.IntegerField(required=False)
     category = forms.IntegerField(required=False)
     currency_name = forms.CharField(required=False)
+    currency_value = forms.CharField(required=False)
     realse_year_ad = forms.CharField(required=False)
     realse_year_ah = forms.CharField(required=False)
     km = forms.CharField(required=False)
@@ -39,6 +40,7 @@ class CoinFilterForm(forms.Form):
     catalog_price = forms.CharField(required=False)
     pick_number = forms.CharField(required=False)
     serial_number = forms.CharField(required=False)
+    remarks = forms.CharField(required=False)
 
 
 class MyDjangoForm(forms.Form):
