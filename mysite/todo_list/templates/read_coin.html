@@ -1,0 +1,87 @@
+{% load widget_tweaks %}
+
+<div class="modal-header">
+  <h3 class="modal-title">Coin details</h3>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+    <div class="">
+    Country:
+    {{ coin.country }}
+  </div>
+    <div class="">
+    Category:
+    {{ coin.category }}
+  </div>
+    <div class="">
+    Currency Name:
+    {{ coin.currency_name }}
+  </div>
+    <div class="">
+    Currency Value:
+    {{ coin.currency_value }}
+  </div>
+    <div class="">
+    Realse Year AD:
+    {{ coin.realse_year_ad }}
+  </div>
+    <div class="">
+   Realse Year AH:
+    {{ coin.realse_year_ah }}
+  </div>
+    <div class="">
+   KM Number:
+    {{ coin.km }}
+  </div>
+    <div class="">
+   Metal Type:
+    {{ coin.metal_type }}
+  </div>
+    <div class="">
+   Quantity:
+    {{ coin.quantity }}
+  </div>
+    <div class="">
+   USA Price:
+    {{ coin.usa_price }}
+     $
+  </div>
+    <div class="">
+   USA Total Price:
+    {{ coin.usa_total_price }}
+     $
+  </div>
+    <div class="">
+   KSA Total Price:
+    {{ coin.sar_total_price }}
+     SAR
+  </div>
+    <div class="">
+   Catalog Price:
+    {{ coin.catalog_price }}
+     $
+  </div>
+    <div class="">
+   Pick Number:
+    {{ coin.pick_number }}
+  </div>
+    <div class="">
+   Serial Number:
+    {{ coin.serial_number }}
+  </div>
+    <div class="">
+   Remarks:
+    {{ coin.remarks }}
+  </div>
+    <div class="">
+   Print City:
+    {{ coin.print_city }}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>

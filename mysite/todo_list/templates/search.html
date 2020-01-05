@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 {% load humanize %}
-{% block title %}Home{% endblock %}
+{% block title %}Search{% endblock %}
 {% block content %}
+{% include "_modal.html" %}
+<div class="accordion" id="accordionExample">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h2 class="mb-0">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          View Search
+        </button>
+      </h2>
+    </div>
 
-  <div class="card card-body">
+       <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+    <div class="card card-body">
 	  <form method="get" action="{% url 'search' %}">
   <div class="form-row">
     <div class="form-group col-md-4">
@@ -89,61 +100,136 @@
       <label for="remarks">Remarks</label>
       <input type="text" value="{{ context.remarks }}" name="remarks" class="form-control" id="remarks">
     </div>
+                         <div class="form-group col-md-4">
+      <label for="print_city">Print City</label>
+      <input type="text" value="{{ context.print_city }}" name="print_city" class="form-control" id="print_city">
+    </div>
   </div>
 
-
-          <button type="submit"  class="btn btn-primary">Search</button>
+ <button type="submit" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Search
+        </button>
           <a href="{% url 'search' %}" class="btn btn-secondary">Cancel</a>
 </form>
   </div>
-
-
-<br>
-
-{% if filter_coins%}
-<table id="table_id"  class="display table table-bordered">
-        <thead>
-    <tr>
-        <th><center>Rank</center></th>
-        <th><center>Country</center></th>
-        <th><center>Currency Name</center></th>
-        <th><center>Realse Year AD</center></th>
-        <th><center>Quantity</center></th>
-        <th><center>USA Price</center></th>
-        <th><center>Total USA Price</center></th>
-        <th><center>Total SAR Price</center></th>
-        <th><center>KM#</center></th>
-    </tr>
-     </thead>
-     <tbody>
-	{% for coin in filter_coins.qs %}
-
-	<tr>
-		<td><center><a href="{% url 'editcoin' coin.id %}">{{ forloop.counter }}</a></center></td>
-        <td><center>{{coin.country}}</center></td>
-		<td><center>{{coin.currency_name}}</center></td>
-        <td><center>{{coin.realse_year_ad}}</center></td>
-        <td><center>{{coin.quantity}}</center></td>
-        <td><center>${{coin.usa_price|floatformat:2|intcomma}}</center></td>
-        <td><center>${{coin.usa_total_price|floatformat:2|intcomma}}</center></td>
-        <td><center>SAR {{coin.sar_total_price|floatformat:2|intcomma}}</center></td>
-        <td><center>{{coin.km}}</center></td>
-    </tr>
-	{% endfor %}
-     </tbody>
-</table>
-{% endif %}
-
     </div>
+  </div>
+
+ </div>
 <br>
+ <table  id="table_id" class="table">
+                <thead>
+                  <tr>
+                    <th class="text-center" scope="col">ID</th>
+                    <th class="text-center" scope="col">Country</th>
+                    <th class="text-center" scope="col">Currency Name</th>
+                    <th class="text-center" scope="col">Realse Year AD</th>
+                    <th class="text-center" scope="col">City</th>
+                    <th class="text-center" scope="col">KM#</th>
+                    <th class="text-center" scope="col">Quantity</th>
+                    <th class="text-center" scope="col">USA Price</th>
+                    <th class="text-center" scope="col">USA Total</th>
+                    <th class="text-center" scope="col">SAR Total</th>
+                    <th class="text-center" scope="col">Read / Update / Delete</th>
+                  </tr>
+                </thead>
+                  <tbody></tbody>
+              </table>
+
 {% endblock %}
 {% block extra_javascript %}
-    <script>
-$(document).ready( function () {
-    $('#table_id').DataTable();
-} );
-    </script>
+ <script>
+    $(document).ready(function() {
+        $('#table_id').DataTable( {
+            "select": true,
+            "fixedHeader": true,
+            "scrollY": "370px",
+            "scrollCollapse": true,
+            "stateSave": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                 url: '{% url "coins_search_json" %}',
+                "type": "get",
+                  "data": {
+                  "csrfmiddlewaretoken": "{{ csrf_token }}",
+                  "country": "{{ filter_coins.country }}",
+                  "category": "{{ filter_coins.category }}",
+                  "currency_name": "{{ filter_coins.currency_name }}",
+                  "currency_value": "{{ filter_coins.currency_value }}",
+                  "realse_year_ad": "{{ filter_coins.realse_year_ad }}",
+                  "realse_year_ah": "{{ filter_coins.realse_year_ah }}",
+                  "print_city": "{{ filter_coins.print_city }}",
+                  "usa_price": "{{ filter_coins.usa_price }}",
+                  "km": "{{ filter_coins.km }}",
+                  "metal_type": "{{ filter_coins.metal_type }}",
+                  "catalog_price": "{{ filter_coins.catalog_price }}",
+                  "pick_number": "{{ filter_coins.pick_number }}",
+                  "serial_number": "{{ filter_coins.serial_number }}",
+                  "remarks": "{{ filter_coins.remarks }}",
+                  }
+            },
+            columnDefs: [
+            {
+             orderable: false,
+             targets: [8,9,10]
+             },
+             {
+             "className": "dt-center",
+              "targets": "_all"
+             }
+
+            ],
+            "columns": [
+                { "data": "id"},
+                { "data": "country" },
+                { "data": "currency_name" },
+                { "data": "realse_year_ad"},
+                { "data": "print_city" },
+                { "data": "km" },
+                { "data": "quantity" },
+                { "data": "usa_price" },
+                { "data": "usa_total_price" },
+                { "data": "sar_total_price" },
+                { "data":  null,
+                render: function ( data, type, row ) {
+                return '<button type="button" class="read-coin btn btn-sm btn-primary" data-id="/read/' +  data.id + '"> ' +
+                '<span class="fa fa-eye"></span></button>' +
+                ' <button type="button" class="update-coin btn btn-sm btn-success" data-id="/update/' +  data.id + '"> ' +
+                '<span class="fa fa-pencil-alt"></span></button>' +
+                ' <button type="button" class="delete-coin btn btn-sm btn-danger" data-id="/delete/' +  data.id + '"> ' +
+                '<span class="fa fa-trash"></span></button>'
+                }
+                }
+            ],
+               "createdRow": function ( row, data, index ) {
+               $('.read-coin', row).modalForm({formURL:$('.read-coin', row).data('id')});
+               $('.update-coin', row).modalForm({formURL:$('.update-coin', row).data('id')});
+               $('.delete-coin', row).modalForm({formURL:$('.delete-coin', row).data('id')});
+               }
+               });
+               }
+               );
+</script>
+<script type="text/javascript">
+   $(document).ready(function() {
+
+       // hide id column
+      var table = $('#table_id').DataTable();
+      table.column( 0 ).visible( false );
+
+      // Hide message
+      $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert").slideUp(500);
+      });
+
+    });
+
+  </script>
+
 {% endblock extra_javascript %}
+
 
 
 

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}{{ category }}{% endblock %}
+{% block content %}
+{% include "_modal.html" %}
+
+  <div class="container mt-3">
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <button class="create-coin btn btn-primary" type="button" name="button">
+              <span class="fa fa-plus mr-2"></span>Create Coin</button>
+          </div>
+          <div class="col-12 mb-3">
+            <div class="container">
+              <table id="table_id" class="table">
+                <thead>
+                  <tr>
+                    <th class="text-center" scope="col">Id</th>
+                    <th class="text-center" scope="col">Serial</th>
+                    <th class="text-center" scope="col">Country</th>
+                    <th class="text-center" scope="col">Currency Name</th>
+                    <th class="text-center" scope="col">Realse Year AD</th>
+                    <th class="text-center" scope="col">City</th>
+                    <th class="text-center" scope="col">KM#</th>
+                    <th class="text-center" scope="col">Quantity</th>
+                    <th class="text-center" scope="col">USA Price</th>
+                    <th class="text-center" scope="col">USA Total</th>
+                    <th class="text-center" scope="col">SAR Total</th>
+                    <th class="text-center" scope="col">Read / Update / Delete</th>
+                  </tr>
+                </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block extra_javascript %}
+ <script>
+    $(document).ready(function() {
+        $('#table_id').DataTable( {
+            "select": true,
+            "fixedHeader": true,
+            "scrollY": "370px",
+            "scrollCollapse": true,
+            "stateSave": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                 url: '{% url "coins_list_json" %}',
+                  "type": "get",
+                  "data": {
+                  "csrfmiddlewaretoken": "{{ csrf_token }}",
+                  "category": "{{ category }}"
+                  }
+            },
+            columnDefs: [
+            {"orderable":  false,targets: [8,9,10,11]},
+            {"className": "dt-center","targets": "_all"},
+            ],
+            "columns": [
+                { "data": "id"},
+                { "data": "row_number"},
+                { "data": "country" },
+                { "data": "currency_name" },
+                { "data": "realse_year_ad"},
+                { "data": "print_city" },
+                { "data": "km" },
+                { "data": "quantity" },
+                { "data": "usa_price" },
+                { "data": "usa_total_price" },
+                { "data": "sar_total_price" },
+                { "data":  null,
+                render: function ( data, type, row) {
+                return '<button type="button" class="read-coin btn btn-sm btn-primary" data-id="/read/' +  data.id + '"> ' +
+                '<span class="fa fa-eye"></span></button>' +
+                ' <button type="button" class="update-coin btn btn-sm btn-success" data-id="/update/' +  data.id + '"> ' +
+                '<span class="fa fa-pencil-alt"></span></button>' +
+                ' <button type="button" class="delete-coin btn btn-sm btn-danger" data-id="/delete/' +  data.id + '"> ' +
+                '<span class="fa fa-trash"></span></button>'
+                }
+                }
+            ],
+               "createdRow": function ( row, data, index ) {
+               $('.read-coin', row).modalForm({formURL:$('.read-coin', row).data('id')});
+               $('.update-coin', row).modalForm({formURL:$('.update-coin', row).data('id')});
+               $('.delete-coin', row).modalForm({formURL:$('.delete-coin', row).data('id')});
+               }
+               });
+               });
+</script>
+<script>
+   $(document).ready(function() {
+
+       // hide id column
+      var table = $('#table_id').DataTable();
+      table.column( 0 ).visible( false );
+
+      // Create coin button
+      $(".create-coin").modalForm({formURL: "{% url 'create_coin' %}", modalID: "#create-modal"});
+
+      // Hide message
+      $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert").slideUp(500);
+      });
+
+    });
+
+  </script>
+{% endblock extra_javascript %}
+

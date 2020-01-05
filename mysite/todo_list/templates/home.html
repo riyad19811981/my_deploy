@@ -1,61 +1,6 @@
 {% extends 'base.html' %}
-{% load humanize %}
 {% block title %}Home{% endblock %}
+
 {% block content %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-primary alert-dismissable" role="alert">
-	 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
- {{message}}
-</div>
-
-{% endfor %}
-{% endif %}
-{% if all_coins %}
-<table id="table_id" class="table table-bordered">
-    <thead>
-    <tr>
-        <th><center>Rank</center></th>
-        <th><center>Country</center></th>
-        <th><center>Currency Name</center></th>
-        <th><center>Realse Year AD</center></th>
-        <th><center>Quantity</center></th>
-        <th><center>USA Price</center></th>
-        <th><center>Total USA Price</center></th>
-        <th><center>Total SAR Price</center></th>
-        <th><center>KM#</center></th>
-    </tr>
-      </thead>
-      <tbody>
-	{% for coin in all_coins %}
-
-	<tr>
-		<td><center><a href="{% url 'editcoin' coin.id %}">{{ forloop.counter }}</a></center></td>
-        <td><center>{{coin.country}}</center></td>
-		<td><center>{{coin.currency_name}}</center></td>
-        <td><center>{{coin.realse_year_ad}}</center></td>
-        <td><center>{{coin.quantity}}</center></td>
-        <td><center>${{coin.usa_price|floatformat:2|intcomma}}</center></td>
-        <td><center>${{coin.usa_total_price|floatformat:2|intcomma}}</center></td>
-        <td><center>SAR {{coin.sar_total_price|floatformat:2|intcomma}}</center></td>
-        <td><center>{{coin.km}}</center></td>
-    </tr>
-	{% endfor %}
-      </tbody>
-</table>
-{% endif %}
- 
-    </div>
+<h1>Welcome to Salah Coins</h1>
 {% endblock %}
-{% block extra_javascript %}
-    <script>
-$(document).ready( function () {
-    $('#table_id').DataTable();
-} );
-    </script>
-{% endblock extra_javascript %}
-
-
-

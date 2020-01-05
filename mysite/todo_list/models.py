@@ -1,46 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
-
-
-class UserProfileInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    portfolio_site = models.URLField(blank=True)
-    profile_pic = models.ImageField(upload_to='profile_pic', blank=True)
-
-    def __str__(self):
-        return self.user.username
-
-
-class List(models.Model):
-    item = models.CharField(max_length=200)
-    completed = models.BooleanField(default=False)
-
-    def __str__(slef):
-        return slef.item
-
-
-class Topic(models.Model):
-    top_name = models.CharField(max_length=264, unique=True)
-
-    def __str__(self):
-        return self.top_name
-
-
-class WebPage(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
-    name = models.CharField(max_length=264, unique=True)
-    url = models.URLField(unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class AccessRecord(models.Model):
-    name = models.ForeignKey(WebPage, on_delete=models.CASCADE)
-    date = models.DateField()
-
-    def __str__(self):
-        return str(self.date)
 
 
 class Country(models.Model):
@@ -65,17 +23,8 @@ class Category(models.Model):
         return self.name
 
 
-class Person(models.Model):
-    name = models.CharField(max_length=100)
-    birthdate = models.DateField(null=True, blank=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Coin(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     currency_name = models.CharField(max_length=50)
@@ -90,14 +39,23 @@ class Coin(models.Model):
     pick_number = models.CharField(max_length=50, null=True, blank=True)
     serial_number = models.CharField(max_length=50, null=True, blank=True)
     remarks = models.CharField(max_length=100, null=True, blank=True)
+    print_city = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.currency_name
 
+    @property
     def usa_total_price(self):
-        return self.quantity * self.usa_price
+        number = round(self.quantity * self.usa_price, 2)
+        # to to return number with comma seperator
+        return "{:,}".format(number)
 
+    @property
     def sar_total_price(self):
-        return self.quantity * self.usa_price * 3.75
+        number = round(self.quantity * self.usa_price * 3.75, 2)
+        # to to return number with comma seperator
+        return "{:,}".format(number)
+
+
